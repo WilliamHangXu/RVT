@@ -3,6 +3,7 @@
 # Licensed under the NVIDIA Source Code License [see LICENSE for details].
 
 **__pycache__/
+/rvt/tmp/
 /rvt/replay/
 /rvt/data/
 coppelia_install_dir/

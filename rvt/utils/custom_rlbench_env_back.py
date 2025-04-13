@@ -25,18 +25,10 @@ class CustomMultiTaskRLBenchEnv2(CustomMultiTaskRLBenchEnv):
         self._episodes_this_task += 1
 
         self._i = 0
-        # self._task.set_variation(-1)
-
-        if self._task_class_variation_idx != None:
-            self._task.set_variation(0)
-            self._task._task.task_path = self._task._task.name + f"_{str(self._task_class_variation_idx[self._active_task_id])}"
-        else:
-            self._task.set_variation(-1)
-
+        self._task.set_variation(-1)
         d = self._task.get_demos(
             1, live_demos=False, random_selection=False, from_episode_number=i
         )[0]
-
 
         self._task.set_variation(d.variation_number)
         desc, obs = self._task.reset_to_demo(d)

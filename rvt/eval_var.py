@@ -189,12 +189,13 @@ def load_agent(
 
     print("Agent Information")
     print(agent)
-    return agent
+    return agent, exp_cfg.method
 
 
 @torch.no_grad()
 def eval(
     agent,
+    method,
     tasks,
     eval_datafolder,
     start_episode=0,
@@ -206,8 +207,7 @@ def eval(
     logging=False,
     log_dir=None,
     verbose=True,
-    save_video=False,
-    add_mask=False,
+    save_video=False
 ):
     agent.eval()
     if isinstance(agent, rvt_agent.RVTAgent):
@@ -281,7 +281,7 @@ def eval(
                 csv_writer.writeheader()
 
     # evaluate agent
-    rollout_generator = RolloutGenerator(device, add_mask=add_mask, save_dir=log_dir)
+    rollout_generator = RolloutGenerator(device, method=method, save_dir=log_dir)
     stats_accumulator = SimpleAccumulator(eval_video_fps=30)
 
     
@@ -511,7 +511,7 @@ def _eval(args):
                 continue
 
         if not (args.peract_official):
-            agent = load_agent(
+            agent, method = load_agent(
                 model_path=model_path,
                 exp_cfg_path=args.exp_cfg_path,
                 mvt_cfg_path=args.mvt_cfg_path,
@@ -524,7 +524,7 @@ def _eval(args):
                 args.eval_log_dir, os.path.basename(model_path).split(".")[0]
             )
         else:
-            agent = load_agent(
+            agent, method = load_agent(
                 peract_official=args.peract_official,
                 peract_model_dir=args.peract_model_dir,
                 device=args.device,
@@ -535,6 +535,7 @@ def _eval(args):
         os.makedirs(agent_eval_log_dir, exist_ok=True)
         scores = eval(
             agent=agent,
+            method=method,
             tasks=tasks_to_eval,
             eval_datafolder=args.eval_datafolder,
             start_episode=args.start_episode,
@@ -546,8 +547,7 @@ def _eval(args):
             logging=True,
             log_dir=agent_eval_log_dir,
             verbose=True,
-            save_video=args.save_video,
-            add_mask=args.add_mask,
+            save_video=args.save_video
         )
         print(f"model {model_path}, scores {scores}")
         task_scores = {}

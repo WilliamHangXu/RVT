@@ -18,7 +18,7 @@ trap "echo 'Script interrupted'; exit" SIGINT SIGQUIT
 #     --add-mask
 
 # Define your task lists
-box_tasks=("close_box_0" "close_box_1" "close_box_2" "close_box_6" "close_box_8" "close_box_9" "close_box_10" "close_box_11" "close_box_12" "close_box_13" "close_box_14" "close_box_15" "close_box_16" "close_box_17")
+box_tasks=("close_box_1" "close_box_2" "close_box_6" "close_box_8" "close_box_9" "close_box_10" "close_box_11" "close_box_12" "close_box_13" "close_box_14" "close_box_15" "close_box_16" "close_box_17")
 slide_tasks=("slide_block_to_target_0" "slide_block_to_target_1" "slide_block_to_target_2" "slide_block_to_target_4" "slide_block_to_target_8" "slide_block_to_target_9" "slide_block_to_target_10" "slide_block_to_target_11" "slide_block_to_target_12" "slide_block_to_target_13" "slide_block_to_target_14" "slide_block_to_target_15" "slide_block_to_target_16" "slide_block_to_target_17")
 wine_tasks=("place_wine_at_rack_location_0" "place_wine_at_rack_location_1" "place_wine_at_rack_location_2" "place_wine_at_rack_location_3" "place_wine_at_rack_location_5" "place_wine_at_rack_location_6" "place_wine_at_rack_location_7" "place_wine_at_rack_location_8" "place_wine_at_rack_location_9" "place_wine_at_rack_location_10" "place_wine_at_rack_location_11" "place_wine_at_rack_location_12" "place_wine_at_rack_location_13" "place_wine_at_rack_location_14" "place_wine_at_rack_location_15" "place_wine_at_rack_location_16" "place_wine_at_rack_location_17")
 rope_tasks=("straighten_rope_0" "straighten_rope_1" "straighten_rope_2" "straighten_rope_4" "straighten_rope_8" "straighten_rope_9" "straighten_rope_10" "straighten_rope_11" "straighten_rope_12" "straighten_rope_13" "straighten_rope_14" "straighten_rope_15" "straighten_rope_16" "straighten_rope_17")
@@ -32,7 +32,7 @@ reach_tasks=("reach_and_drag_0" "reach_and_drag_1" "reach_and_drag_2" "reach_and
 task_list_names=("box_tasks")
 # Optionally, if each task list requires a specific model folder, you can map them
 declare -A model_folders=(
-  [box_tasks]="/home/hangxu/RVT/rvt/runs/close_box_umvp_10_1"
+  [box_tasks]="runs/close_box_base_10"
   [slide_tasks]="runs/slide_block_base_15"
   [wine_tasks]="runs/place_wine_base_15"
   [rope_tasks]="runs/rope_base_15"
@@ -56,9 +56,9 @@ for list_name in "${task_list_names[@]}"; do
       --tasks "$task" \
       --eval-episodes "$eval_episodes" \
       --log-name test/"$eval_dir" \
-      --device 2 \
+      --device 1 \
       --headless \
-      --model-name model_9.pth \
+      --model-name model_0.pth \
       --save-video
   done
 done
