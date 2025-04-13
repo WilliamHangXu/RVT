@@ -368,7 +368,8 @@ def fill_replay(
 
             # get language goal from disk
             varation_descs_pkl_file = os.path.join(
-                data_path, episode_folder % d_idx, variation_desriptions_pkl
+                # data_path, episode_folder % d_idx, variation_desriptions_pkl
+                data_path.replace("episodes",""), variation_desriptions_pkl
             )
             with open(varation_descs_pkl_file, "rb") as f:
                 descs = pickle.load(f)

@@ -66,7 +66,7 @@ def get_dataset(
 
     for task in tasks:  # for each task
         # print("---- Preparing the data for {} task ----".format(task), flush=True)
-        EPISODES_FOLDER_TRAIN = f"train/{task}/all_variations/episodes"
+        EPISODES_FOLDER_TRAIN = f"{task}_0/variation0/episodes"
         EPISODES_FOLDER_VAL = f"val/{task}/all_variations/episodes"
         data_path_train = os.path.join(DATA_FOLDER, EPISODES_FOLDER_TRAIN)
         data_path_val = os.path.join(DATA_FOLDER, EPISODES_FOLDER_VAL)

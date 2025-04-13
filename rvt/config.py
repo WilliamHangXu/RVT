@@ -6,6 +6,8 @@ from yacs.config import CfgNode as CN
 
 _C = CN()
 
+"Baseline (base) or UMVP (umvp)?"
+_C.method = "base"
 _C.agent = "our"
 _C.tasks = "insert_onto_square_peg,open_drawer,place_wine_at_rack_location,light_bulb_in"
 _C.exp_id = "def"

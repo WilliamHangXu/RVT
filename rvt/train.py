@@ -155,6 +155,12 @@ def experiment(rank, cmd_args, devices, port):
 
     old_exp_cfg_peract_lr = exp_cfg.peract.lr
     old_exp_cfg_exp_id = exp_cfg.exp_id
+    method = exp_cfg.method
+    print("Baseline or UMVP: ", method)
+    if method == "base":
+        DATA_FOLDER = 'data/train_256'
+    else:
+        DATA_FOLDER = 'data/train_gpt_2'
 
     exp_cfg.peract.lr *= len(devices) * exp_cfg.bs
     if cmd_args.exp_cfg_opts != "":
@@ -172,8 +178,12 @@ def experiment(rank, cmd_args, devices, port):
     # to match peract, iterations per epoch
     TRAINING_ITERATIONS = int(exp_cfg.train_iter // (exp_cfg.bs * len(devices)))
     EPOCHS = exp_cfg.epochs
-    TRAIN_REPLAY_STORAGE_DIR = "replay/replay_train"
-    TEST_REPLAY_STORAGE_DIR = "replay/replay_val"
+    if method == "base":
+        TRAIN_REPLAY_STORAGE_DIR = "replay/replay_train_base"
+        TEST_REPLAY_STORAGE_DIR = "replay/replay_val_base"
+    else:
+        TRAIN_REPLAY_STORAGE_DIR = "replay/replay_train_gpt_2"
+        TEST_REPLAY_STORAGE_DIR = "replay/replay_val_gpt_2"
     log_dir = get_logdir(cmd_args, exp_cfg)
     tasks = get_tasks(exp_cfg)
     print("Training on {} tasks: {}".format(len(tasks), tasks))

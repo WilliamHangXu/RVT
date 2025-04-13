@@ -1,8 +1,9 @@
-exp_id: rvt
-tasks: all
-bs: 3
+exp_id: close_box_base_10
+tasks: close_box
+bs: 12
+method: base
 num_workers: 3
-epochs: 15
+epochs: 10
 sample_distribution_mode: task_uniform
 peract:
   lr: 1e-4
