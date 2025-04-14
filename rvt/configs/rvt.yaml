@@ -1,5 +1,5 @@
-exp_id: close_box_base_10
-tasks: close_box
+exp_id: scoop_with_spatula_base_10
+tasks: scoop_with_spatula
 bs: 12
 method: base
 num_workers: 3

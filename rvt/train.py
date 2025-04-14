@@ -118,10 +118,12 @@ def get_logdir(cmd_args, exp_cfg):
     return log_dir
 
 
-def dump_log(exp_cfg, mvt_cfg, cmd_args, log_dir):
+def dump_log(exp_cfg, mvt_cfg, cmd_args, log_dir, data_folder, replay_folder):
     with open(f"{log_dir}/exp_cfg.yaml", "w") as yaml_file:
         with redirect_stdout(yaml_file):
             print(exp_cfg.dump())
+            print("# data_folder: ", data_folder)
+            print("# replay_folder: ", replay_folder)
 
     with open(f"{log_dir}/mvt_cfg.yaml", "w") as yaml_file:
         with redirect_stdout(yaml_file):
@@ -265,7 +267,7 @@ def experiment(rank, cmd_args, devices, port):
         exp_cfg.defrost()
         exp_cfg.peract.lr = old_exp_cfg_peract_lr
         exp_cfg.exp_id = old_exp_cfg_exp_id
-        dump_log(exp_cfg, mvt_cfg, cmd_args, log_dir)
+        dump_log(exp_cfg, mvt_cfg, cmd_args, log_dir, DATA_FOLDER, TRAIN_REPLAY_STORAGE_DIR)
         exp_cfg.peract.lr = temp1
         exp_cfg.exp_id = temp2
         exp_cfg.freeze()
