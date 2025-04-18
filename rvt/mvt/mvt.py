@@ -7,9 +7,11 @@ import torch
 
 from torch import nn
 from torch.cuda.amp import autocast
-
+import os
+import cv2
+import numpy as np
 import rvt.mvt.utils as mvt_utils
-
+import torchvision.utils as vutils
 from rvt.mvt.mvt_single import MVT as MVTSingle
 from rvt.mvt.config import get_cfg_defaults
 from rvt.mvt.renderer import BoxRenderer
@@ -124,7 +126,7 @@ class MVT(nn.Module):
         self.num_img = self.renderer.num_img
         self.proprio_dim = proprio_dim
         self.img_size = img_size
-
+        self.step = 0
         self.mvt1 = MVTSingle(
             **args,
             renderer=self.renderer,
@@ -132,6 +134,18 @@ class MVT(nn.Module):
         )
         if self.stage_two:
             self.mvt2 = MVTSingle(**args, renderer=self.renderer)
+
+    def set_step(self, step):
+        self.step = step
+        # self.mvt1.set_step(step)
+        # if self.stage_two:
+        #     self.mvt2.set_step(step)
+
+    def set_dir(self, dir):
+        self.dir = dir
+        # self.mvt1.set_dir(dir)
+        # if self.stage_two:
+        #     self.mvt2.set_dir(dir)
 
     def get_pt_loc_on_img(self, pt, mvt1_or_mvt2, dyn_cam_info, out=None):
         """
@@ -391,6 +405,8 @@ class MVT(nn.Module):
         else:
             wpt_local_stage_one = wpt_local
 
+        
+
         out = self.mvt1(
             img=img,
             proprio=proprio,
@@ -399,6 +415,63 @@ class MVT(nn.Module):
             rot_x_y=rot_x_y,
             **kwargs,
         )
+
+        if not self.training:
+            bs, num_img, img_feat_dim, h, w = img.shape
+            mvt_input_path = os.path.join(self.dir, "mvt_input", str(self.step))
+            os.makedirs(mvt_input_path, exist_ok=True)
+            mvt_output_path = os.path.join(self.dir, "mvt_output", str(self.step))
+            os.makedirs(mvt_output_path, exist_ok=True)
+            
+        
+            for b in range(bs):
+                for v in range(num_img):
+
+                    # Get RGB and depth images
+                    rgb_img = img[b,v,3:6]  # First 3 channels are RGB
+                    depth_img = img[b,v,6]  # Last channel is depth
+                    
+                    
+                    # Save RGB image
+                    vutils.save_image(
+                        rgb_img, 
+                        f"{mvt_input_path}/mvt_input_rgb_{b:02d}_view{v:02d}.jpg",
+                        normalize=True
+                    )
+                    # cv2.imwrite(f"{mvt_input_path}/mvt_input_rgb_{b:02d}_view{v:02d}.jpg", rgb_img.cpu().numpy().transpose(1, 2, 0))
+                    
+                    # Save depth image 
+                    vutils.save_image(
+                        depth_img,
+                        f"{mvt_input_path}/mvt_input_depth_{b:02d}_view{v:02d}.jpg",
+                        normalize=True
+                    )
+                    # cv2.imwrite(f"{mvt_input_path}/mvt_input_depth_{b:02d}_view{v:02d}.jpg", depth_img.cpu().numpy())
+
+            # 2. Save the output heatmaps
+            nc = self.num_img
+            h = w = self.img_size
+            bs = out["trans"].shape[0]
+            
+            q_trans = out["trans"].view(bs, nc, h * w)
+            hm = torch.nn.functional.softmax(q_trans, 2)
+            hm = hm.view(bs, nc, h, w)
+            
+            for c in range(nc):
+                # Get heatmap for this camera (using first batch)
+                heatmap = hm[0, c].detach().cpu().numpy()
+                
+                # Normalize to 0-255 range for visualization
+                heatmap_norm = cv2.normalize(heatmap, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+                
+                # Apply colormap for better visualization
+                heatmap_color = cv2.applyColorMap(heatmap_norm, cv2.COLORMAP_JET)
+                
+                # Save the colorized heatmap
+                save_path = f"{mvt_output_path}/mvt_output_{c:02d}.jpg"
+                cv2.imwrite(save_path, heatmap_color)
+
+
 
         if self.stage_two:
             with torch.no_grad():

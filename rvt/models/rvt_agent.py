@@ -342,6 +342,7 @@ class RVTAgent:
         self.move_pc_in_bound = move_pc_in_bound
         self.rot_ver = rot_ver
         self.rot_x_y_aug = rot_x_y_aug
+        self.step = 0
 
         self._cross_entropy_loss = nn.CrossEntropyLoss(reduction="none")
         if isinstance(self._network, DistributedDataParallel):
@@ -398,6 +399,14 @@ class RVTAgent:
             total_epoch=self.warmup_steps,
             after_scheduler=after_scheduler,
         )
+
+    def set_step(self, step):
+        self.step = step
+        self._network.set_step(step)
+
+    def set_dir(self, dir):
+        self.dir = dir
+        self._network.set_dir(dir)
 
     def load_clip(self):
         self.clip_model, self.clip_preprocess = clip.load("RN50", device=self._device)

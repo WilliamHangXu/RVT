@@ -2,6 +2,5 @@
 
 python train.py \
     --exp_cfg_path configs/rvt.yaml \
-    --device 2 \
-    --refresh_replay
+    --device 1
     # --mvt_cfg_path mvt/configs/rvt2.yaml \

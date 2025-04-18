@@ -40,6 +40,7 @@ from rvt.utils.peract_utils import (
     IMAGE_SIZE,
     get_official_peract,
 )
+# IMAGE_SIZE = 128
 from rvt.utils.rlbench_planning import (
     EndEffectorPoseViaPlanning2 as EndEffectorPoseViaPlanning,
 )
@@ -209,6 +210,9 @@ def eval(
     verbose=True,
     save_video=False
 ):
+    print(f">>> Starting eval: replay_ground_truth={replay_ground_truth}, "
+                         f"tasks={tasks}, model_folder={args.model_folder}, "
+                         f"model_name={args.model_name}")
     agent.eval()
     if isinstance(agent, rvt_agent.RVTAgent):
         agent.load_clip()
@@ -281,7 +285,10 @@ def eval(
                 csv_writer.writeheader()
 
     # evaluate agent
-    rollout_generator = RolloutGenerator(device, method=method, save_dir=log_dir)
+    img_dir = os.path.join(log_dir, "img")
+    if os.path.exists(img_dir):
+        shutil.rmtree(img_dir)
+    rollout_generator = RolloutGenerator(device, method=method, save_dir=img_dir)
     stats_accumulator = SimpleAccumulator(eval_video_fps=30)
 
     
@@ -404,20 +411,20 @@ def eval(
                             cv2.imwrite(
                                 os.path.join(video_image_folder, f"{idx}.png"), video[idx]
                             )
-                        images_path = os.path.join(video_image_folder, r"%d.png")
-                        os.system(
-                            "ffmpeg -i {} -vf palettegen palette.png -hide_banner -loglevel error".format(
-                                images_path
-                            )
-                        )
-                        os.system(
-                            "ffmpeg -framerate {} -i {} -i palette.png -lavfi paletteuse {} -hide_banner -loglevel error".format(
-                                record_fps, images_path, video_path
-                            )
-                        )
-                        print(f'video saved - {task_name}')
-                        os.remove("palette.png")
-                        shutil.rmtree(video_image_folder)
+                        # images_path = os.path.join(video_image_folder, r"%d.png")
+                        # os.system(
+                        #     "ffmpeg -i {} -vf palettegen palette.png -hide_banner -loglevel error".format(
+                        #         images_path
+                        #     )
+                        # )
+                        # os.system(
+                        #     "ffmpeg -framerate {} -i {} -i palette.png -lavfi paletteuse {} -hide_banner -loglevel error".format(
+                        #         record_fps, images_path, video_path
+                        #     )
+                        # )
+                        # print(f'video saved - {task_name}')
+                        # os.remove("palette.png")
+                        # shutil.rmtree(video_image_folder)
 
     eval_env.shutdown()
 
@@ -453,8 +460,11 @@ def get_model_index(filename):
 def _eval(args):
 
     model_paths = []
+    print(11111111111111111)
+    print(args.peract_official)
     if not (args.peract_official):
         assert args.model_name is not None
+        print(args.model_folder, args.model_name)
         model_paths.append(os.path.join(args.model_folder, args.model_name))
     else:
         model_paths.append(None)

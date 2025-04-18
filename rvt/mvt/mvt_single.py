@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from torch import nn
 from einops import rearrange, repeat
 
+
 import rvt.mvt.utils as mvt_utils
 from rvt.mvt.attn import (
     Conv2DBlock,
@@ -153,7 +154,7 @@ class MVT(nn.Module):
         self.rot_ver = rot_ver
         self.num_rot = num_rot
         self.no_feat = no_feat
-
+        # self.step = 0
         if self.cvx_up:
             assert not self.inp_pre_con, (
                 "When using the convex upsampling, we do not concatenate"
@@ -407,6 +408,12 @@ class MVT(nn.Module):
             pt, fix_cam=True, dyn_cam_info=dyn_cam_info
         )
         return pt_img
+
+    # def set_step(self, step):
+    #     self.step = step
+
+    # def set_dir(self, dir):
+    #     self.dir = dir
 
     def forward(
         self,
